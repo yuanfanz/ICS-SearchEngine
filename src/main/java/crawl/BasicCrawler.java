@@ -35,7 +35,7 @@ import data.*;
 
 public class BasicCrawler extends WebCrawler {
 
-        private tokenGen tokengen = null;
+        //private tokenGen tokengen = null;
         private final static Pattern IMAGE_EXTENSIONS = Pattern.compile(".*(\\.(css|js|bmp|gif|jpeg|png|tiff|mid|mp2" +
                 "|mp3|mp4|wav|avi|mov|mpeg|ram|m4v|pdf|java|cpp|rm|smil|wmv|swf|wma|zip|rar|gz|ico|pfm|c|h|o))$");
         private int pagecount = 0;
