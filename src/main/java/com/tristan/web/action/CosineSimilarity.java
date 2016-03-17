@@ -47,7 +47,7 @@ public class CosineSimilarity {
 		fnorm = calculateNorm(firstFeatures);
 		snorm = calculateNorm(secondFeatures);
 		similarity = sum / (fnorm * snorm);
-		return similarity;
+		return sum;
 	}
 	
 	/**
