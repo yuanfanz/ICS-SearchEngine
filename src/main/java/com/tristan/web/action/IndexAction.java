@@ -36,7 +36,7 @@ public class IndexAction extends Controller{
 	@ActionKey("/search")
 	public void search() {
 		List<String> keywords = new LinkedList<String>();
-		String key = getPara("key");
+		String key = getPara("key").toLowerCase();
 		if (StrKit.isBlank(key)) {
 			render("Index.jsp");
 			return;
@@ -55,11 +55,16 @@ public class IndexAction extends Controller{
 //		String reduce = "function(doc, aggr){" + "aggr.count += 1;" + "        }";
 		
 		MongoQuery query = new MongoQuery();
-		for (String k : keywords) {
-			query.like("token",k);
-		}
 		MongoKit.setDb(db);
-		List<DBObject> dbObjects = MongoKit.findByQuery("tokens", query, 10);
+		List<DBObject> dbObjects = null;
+		for (String k : keywords) {
+			//query.like("token",k);
+			query.set("token",k);
+			if ( dbObjects==null )  dbObjects = MongoKit.findByQuery("tokens", query, 30);
+			else dbObjects.addAll( MongoKit.findByQuery("tokens", query, 30) );
+		}
+		
+		
 		List<Url> datas = process(dbObjects);
 		for (Url  url : datas) {
 			List<DBObject> urls = MongoKit.findByQuery("URLID", new MongoQuery().set("URLID", url.getUrlId()), 1);
@@ -96,11 +101,12 @@ public class IndexAction extends Controller{
 		for (DBObject dbObject : results) {
 			//compute query vector
 			Double IDF = Double.valueOf(dbObject.get("IDF").toString());
-			query.put(dbObject.get("token").toString(), IDF);
+			query.put(dbObject.get("token").toString(), IDF);	//assume TF = 1
 		}
 		
 		//token
 		for (DBObject dbObject : results) {
+			//docs.clear();
 			BasicDBList list = (BasicDBList)dbObject.get("URLs");
 			//URL list
 			for (Object object : list) {
@@ -108,12 +114,14 @@ public class IndexAction extends Controller{
 				Integer uriId = (Integer)object2.get("URL");
 				Double score = Double.valueOf(object2.get("TFIDF").toString());
 				
-				//Double o = datas.get(uriId);
-				//if (o == null) {
-				//	datas.put(uriId, score);
-				//}else {
-				//	datas.put(uriId, score + o);
-				//}
+				/*
+				Double o = datas.get(uriId);
+				if (o == null) {
+					datas.put(uriId, score);
+				}else {
+					datas.put(uriId, score + o);
+				}
+				*/
 				
 				HashMap<String, Double> tmp = docs.get(uriId);
 				if ( tmp == null ) {	//還沒有在裡面
@@ -124,17 +132,22 @@ public class IndexAction extends Controller{
 					tmp.put(dbObject.get("token").toString(), score);
 					docs.put(uriId, tmp);
 				}
+				
 			}
-			Iterator it = docs.entrySet().iterator();
-			while ( it.hasNext() ) {	//datas
-				Map.Entry pair = (Map.Entry) it.next();
-				//put cos similarity to uriID
-				datas.put((Integer)pair.getKey(), CosineSimilarity.calculateCosineSimilarity( (HashMap<String, Double>)query, 
-						(HashMap<String, Double>)pair.getValue()) );
-			}
+			
+		}
+		
+		Iterator it = docs.entrySet().iterator();
+		while ( it.hasNext() ) {	//datas
+			Map.Entry pair = (Map.Entry) it.next();
+			//put cos similarity to uriID
+			datas.put((Integer)pair.getKey(), CosineSimilarity.calculateCosineSimilarity( (HashMap<String, Double>)query, 
+					(HashMap<String, Double>)( pair.getValue() )) );
+			//datas.put((Integer)pair.getKey(), 1.0 );
 		}
 		
 		
+		//System.out.println("HIHIHI");
 		
 		List<Url> result = new ArrayList<>();
 		for (Map.Entry<Integer,Double> entry : datas.entrySet()) {
@@ -145,9 +158,11 @@ public class IndexAction extends Controller{
 		}
 		Collections.sort(result);
 		Collections.reverse(result);
-		if(result.size() >= 10){
-			return result.subList(0, 10);
+		
+		if(result.size() >= 30){
+			return result.subList(0, 30);
 		}
+		
 		return result;
 	}
 }
