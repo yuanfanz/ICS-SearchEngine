@@ -159,8 +159,8 @@ public class IndexAction extends Controller{
 		Collections.sort(result);
 		Collections.reverse(result);
 		
-		if(result.size() >= 30){
-			return result.subList(0, 30);
+		if(result.size() >= 10){
+			return result.subList(0, 10);
 		}
 		
 		return result;
