@@ -14,3 +14,5 @@ We use anchor-text collection to enhance webpage's ranking accuracy. Anchor text
 MongoDB is used to store cached pages, indices and other supplemented data. Go into src/main/java/storage for details.
 
 ## Web Interface:
+With JSP and Servlets, search engine interface is implemented with Bootstrap and some revise with HTML/CSS.
+Future work: We may add asynchronous searching feature with AJAX. 
