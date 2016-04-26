@@ -1,36 +1,16 @@
-# CS221_Proj
+# UCI-ICS-search-engine
+Chien-Lin Chen, Yen-Feng Cheng, Yuanfan Zhang (Ordered by characters)
+It is a search engine for ICS school of UC, Irvine.
 
-## Storage: 
-Use MongoDB to store data. Every change will reflect to "online database", which means we are now using the same database. After the function is stable, I'll change it to local to run on ICS machine.
-### Classes: 
-  * FileStorage: store whole pages, mainly for 遠帆
-  * TokenStorage: store tokens and 3-grams, mainly for 建霖學長
-  * Please do not use reset() function when connecting to ICS server
-  * For function details, please generate javadoc.
-### How to check stat online:
-  * MongoLab: https://mongolab.com/databases/cs221_rawpages
-    * login with UCInetID with psd: "abc123"
-  * ICS: 
-    * Need to download mongoDB client, or use it on ICS
-    * on ICS: "module load mongodb/3.0.1" before using mongoDB command
-
-      ```
-      mongo ramon-limon.ics.uci.edu:8888
-      use cs221_rawpages
-      db.auth("UCI_Handsomes","UCI_Handsomes")
-      db.printCollectionStats()
-      ```
-      
-    * Use "mongo ramon-limon.ics.uci.edu:8888" to login to ICS mongoDB server
-    * "use cs221_rawpages" to change to cs221_rawpages DB
-    * "db.auth("UCI_Handsomes","UCI_Handsomes")" to authenticate as proper user
-    * "db.printCollectionStats()" to print out stats
-
-## Tokenizer:
-tokenize(text, URL)
-divide URL into domain & subdomain
-
+![alt tag](https://raw.githubusercontent.com/YenF/UCI-ICS-search-engine/maven/WebInterface.png)
 
 ## Crawler:
+We use [crawler4j](https://github.com/yasserg/crawler4j) as code base and modify it.
 
+## Data:
+We use anchor-text collection to enhance webpage's ranking accuracy. Anchor text is the visible, clickable text in a hyperlink. It can be viewed as a brief and meaningful comment to the webpage pointed by the hyperlink. By anchor-text collection, a webpage can have all the anchor text from webpages pointing to it. Anchor text can let the search engine know what is the key information in this webpage. Therefore, it can enhance ranking accuracy. 
 
+## Storage: 
+MongoDB is used to store cached pages, indices and other supplemented data. Go into src/main/java/storage for details.
+
+## Web Interface:
